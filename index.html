@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MikCaf — From Bengaluru to the World</title>
+<meta name="description" content="Mumbai's street food. Gujarat's flavours. Bengaluru's new favourite café. MikCaf — one beginning, many destinations, endless flavours.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Yellowtail&display=swap" rel="stylesheet">
+<style>
+  /* ============ BRAND TOKENS (MikCaf brandbook) ============ */
+  :root{
+    --navy:#31446C; --gold:#B3875F; --sky:#839FB7; --sand:#ECD6B1; --ink:#0B2840; --tan:#CAA884;
+    --cream:#FFF5EC; --paper:#FBF6EF;
+    --ease:cubic-bezier(.22,.8,.2,1);
+    --script:'Yellowtail','Magnolia Script',cursive;   /* swap for Magnolia Script webfont when licensed */
+    --sans:'Jost','Futura','Century Gothic',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);font-weight:300;color:var(--ink);background:var(--cream);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  img{display:block;max-width:100%}
+  a{color:inherit}
+  h1,h2,h3{font-weight:500;text-transform:lowercase;letter-spacing:-.01em;line-height:1.1}
+  .script{font-family:var(--script);font-weight:400;text-transform:none;color:var(--gold)}
+  .eyebrow{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:16px;display:block}
+  .wrap{width:min(1040px,86vw);margin:0 auto}
+
+  /* ============ SIDE DOTS ============ */
+  .side-nav-blur{position:fixed;z-index:39;top:0;right:0;width:clamp(220px,24vw,360px);height:100vh;height:100dvh;background:transparent;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);mask-image:radial-gradient(ellipse 100% 72% at 100% 50%,#000 0%,rgba(0,0,0,.72) 52%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse 100% 72% at 100% 50%,#000 0%,rgba(0,0,0,.72) 52%,transparent 100%);pointer-events:none}  .dots{--dot-ink:#31446c;position:fixed;right:clamp(14px,2.2vw,34px);top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:26px;list-style:none}
+  .dots a{display:flex;align-items:center;justify-content:flex-end;gap:12px;text-decoration:none;font-size:13px;font-weight:600;letter-spacing:.04em;color:var(--dot-ink);height:14px}
+  .dots a span{opacity:0;transform:translateX(8px);transition:.35s var(--ease);pointer-events:none;white-space:nowrap;text-shadow:0 0 3px currentColor,0 1px 5px rgba(255,255,255,.45)}
+  .dots a i{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--dot-ink);transition:.35s var(--ease);flex:none;background:transparent;box-shadow:0 0 0 1px rgba(255,255,255,.35)}
+  .dots a:hover span,.dots a.on span{opacity:1;transform:none}
+  .dots a.on i{background:var(--dot-ink);border-color:var(--dot-ink)}
+  @media(max-width:900px){.dots{display:none}}
+  /* ============ INTRO / NAV BRAND ============ */
+  .intro{position:fixed;inset:0;z-index:1000;overflow:hidden;background:#fff;display:grid;place-items:center;transition:height 1s var(--ease),inset 1s var(--ease),background-color .8s var(--ease);}
+  .intro-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .intro-brand{position:absolute;left:50%;top:50%;width:min(48vw,420px);height:auto;max-height:70vh;object-fit:contain;transform:translate(-50%,-50%);opacity:0;transition:left 1.1s var(--ease),top 1.1s var(--ease),width 1.1s var(--ease),height 1.1s var(--ease),max-height 1.1s var(--ease),opacity .3s ease;}
+  .top .mini{visibility:visible;height:34px;opacity:1;transform:translateY(0);transition:.5s var(--ease)}
+  .top.scrolled .mini{visibility:visible;opacity:1;transform:translateY(0)}
+  .intro.is-settling{inset:0;height:100%;background:#fff;box-shadow:none;}
+  .intro.is-settling .intro-art{opacity:0;transition:opacity .35s ease;}
+  .intro.is-settling .intro-brand{left:50%;top:38px;width:auto;height:34px;max-height:34px;opacity:1;transform:translate(-50%,-50%);}
+  .intro.is-done{pointer-events:none;opacity:0;visibility:hidden;transition:opacity .35s ease,visibility 0s linear .35s;}
+  body.intro-playing{overflow:hidden;}
+  @media(max-width:600px){.intro.is-settling .intro-brand{top:34px;width:auto;height:34px;max-height:34px;transform:translate(-50%,-50%)}}
+  @media(prefers-reduced-motion:reduce){.intro,.intro-brand{transition:none!important}}
+
+  /* ============ TOP BAR ============ */
+  .top{position:fixed;inset:0 0 auto 0;z-index:40;display:flex;justify-content:space-between;align-items:center;padding:20px clamp(20px,4vw,56px);background:#fff;pointer-events:none}
+  .top > *{pointer-events:auto}
+  .top .mini{position:absolute;left:50%;top:50%;height:34px;width:auto;max-width:calc(100vw - 160px);opacity:1;visibility:visible;transform:translate(-50%,-50%);transition:none}
+  .top.scrolled .mini{opacity:1;transform:translate(-50%,-50%)}
+  .top .cta{font-size:13px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:var(--navy);padding:10px 20px;border:1px solid var(--navy);background:rgba(255,245,236,.7);backdrop-filter:blur(6px);transition:.35s var(--ease)}
+  .top .cta:hover{background:var(--navy);color:var(--cream)}
+  .top-links{display:flex;align-items:center;gap:clamp(14px,2.5vw,34px);margin-left:auto;pointer-events:auto}
+  .top-links a{color:var(--navy);font-size:12px;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;border-bottom:1px solid transparent;transition:color .25s,border-color .25s}
+  .top-links a:hover{color:var(--gold);border-color:var(--gold)}
+  @media(max-width:560px){.top{padding:14px 14px}.top-links{gap:10px}.top-links a{font-size:10px;letter-spacing:.05em}.top .cta{font-size:10px;padding:8px 10px}}
+
+  /* Responsive refinements for narrow, tall, and short viewports */
+  @media(max-width:900px){
+    .hero{height:auto;min-height:max(760px,100svh);padding:104px 0 76px;align-items:flex-start}
+    .hero-bg{inset:auto -4% 0;height:58%;background-size:auto 100%;background-position:right bottom}
+    .hero-inner{max-width:min(620px,72vw);padding:0 24px 150px}
+    .b1{font-size:clamp(30px,5vw,48px)}
+    .b2{margin-left:clamp(20px,7vw,80px)}
+  }
+  @media(max-width:600px){
+    .top{min-height:66px;padding:12px}
+    .top-links{gap:clamp(7px,2vw,12px)}
+    .top-links a{font-size:clamp(9px,2.5vw,11px);letter-spacing:.04em}
+    .top .cta{padding:7px 8px;font-size:9px}
+    .top .mini{height:28px;max-width:25vw}
+    .hero{min-height:max(720px,100svh);padding-top:92px;padding-bottom:70px}
+    .hero-bg{height:48%;background-size:auto 100%;background-position:76% bottom}
+    .hero-inner{max-width:100%;width:100%;padding:0 18px 210px}
+    .hero .kicker{font-size:11px;letter-spacing:.22em;margin-bottom:16px}
+    .b1{max-width:100%;padding:18px 20px;font-size:clamp(28px,8vw,42px)}
+    .b2{margin:16px 0 0 12px;padding:12px 18px}
+    .b2 img{height:clamp(62px,18vw,86px)}
+    .b3{margin-top:18px}.b3 p{font-size:16px}
+    .marquee{padding:11px 0}.marquee span{font-size:12px;padding:0 18px;gap:28px}
+    .wrap{width:min(calc(100% - 36px),680px)}
+    .sec{padding:72px 0}
+    .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 14px}
+    .tiles .tile:nth-child(even){margin-top:18px}
+    .tile .a{aspect-ratio:4/5}.tile h3{font-size:17px;margin-top:12px}
+    .tile p{font-size:10px;letter-spacing:.1em}
+    .fgrid{gap:34px;margin-bottom:70px}.portrait{width:min(100%,320px)}
+    .info>div{padding:30px 20px}
+    .gallery{padding:50px 0}.track-wrap{padding:0 40px}.track{gap:14px}
+    .slide{flex-basis:100%;aspect-ratio:4/5}
+    .arrow{width:40px;height:40px}.arrow.prev{left:6px}.arrow.next{right:6px}
+  }
+  @media(max-width:380px){
+    .top-links{gap:6px}.top-links a{font-size:8px}.top .cta{padding:6px;font-size:8px}
+    .top .mini{height:24px}.hero-inner{padding-left:14px;padding-right:14px}
+    .tiles{gap:18px 10px}.track-wrap{padding:0 32px}
+  }
+  @media(max-height:520px) and (orientation:landscape){
+    .hero{height:auto;min-height:620px;padding-top:95px}
+    .hero-bg{inset:-4%;height:auto;background-size:cover;background-position:right center}
+    .hero-inner{max-width:60vw;padding-bottom:110px}
+  }
+
+  /* ============ HERO ============ */
+  .hero{position:relative;height:100vh;min-height:680px;overflow:hidden;background:var(--cream);display:flex;align-items:center}
+  .hero-bg{position:absolute;inset:-4%;background:url(assets/hero.jpg) right center/cover no-repeat;animation:slowzoom 18s ease-out forwards}
+  @keyframes slowzoom{from{transform:scale(1.12)}to{transform:scale(1)}}
+  /* brand doodle pattern (arches, steam, forks) */
+  .doodle{position:absolute;inset:0;opacity:.07;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' fill='none' stroke='%2331446C' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M20 70V40a16 16 0 0 1 32 0v30z'/%3E%3Cpath d='M130 40c-8 8 8 14 0 22M142 40c-8 8 8 14 0 22'/%3E%3Cpath d='M118 70h34v6a17 17 0 0 1-34 0z'/%3E%3Cpath d='M40 150v36M34 150v12a6 6 0 0 0 12 0v-12M46 150v12'/%3E%3Cpath d='M150 160c10-14 24-14 34 0M160 172c6-8 14-8 20 0'/%3E%3C/svg%3E")}
+  .arch-line{position:absolute;border:1.5px solid var(--gold);border-radius:999px 999px 0 0;border-bottom:0;opacity:.55;pointer-events:none}
+  .arch-line.a1{width:clamp(220px,24vw,360px);height:clamp(300px,34vw,500px);left:38%;bottom:-2px;animation:rise 1.6s .6s var(--ease) both}
+  .arch-line.a2{width:clamp(150px,16vw,240px);height:clamp(200px,23vw,330px);left:calc(38% + 40px);bottom:-2px;opacity:.35;animation:rise 1.6s .8s var(--ease) both}
+  @keyframes rise{from{transform:translateY(60px);opacity:0}}
+  .hero-inner{position:relative;z-index:2;padding-left:clamp(24px,8vw,130px);display:flex;flex-direction:column;align-items:flex-start;max-width:min(760px,62vw);padding-bottom:70px}
+  .hero .kicker{font-size:13px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:22px;opacity:0;animation:fade 1s .2s forwards}
+  .b1{background:rgba(49,68,108,.92);color:var(--cream);padding:clamp(20px,2.6vw,34px) clamp(26px,3.4vw,52px);font-size:clamp(28px,3.9vw,56px);font-weight:500;text-transform:lowercase;line-height:1.05;clip-path:inset(0 100% 0 0);animation:wipe 1.1s .4s var(--ease) forwards}
+  .b1 em{font-family:var(--script);font-style:normal;font-weight:400;color:var(--sand);font-size:1.18em}
+  .b2{background:rgba(255,245,236,.92);padding:clamp(14px,1.8vw,24px) clamp(24px,3vw,44px);margin-left:clamp(40px,7vw,120px);clip-path:inset(0 0 100% 0);animation:wipe 1.1s 1s var(--ease) forwards;box-shadow:0 20px 40px -24px rgba(11,40,64,.4)}
+  .b2 img{height:clamp(70px,8.5vw,118px);width:auto}
+  .b3{margin-top:30px;max-width:560px;opacity:0;transform:translateY(20px);animation:up 1s 1.7s var(--ease) forwards}
+  .b3 p{font-size:clamp(16px,1.5vw,21px);line-height:1.55;color:var(--navy);font-weight:400}
+  .b3 p b{font-weight:500;color:var(--gold)}
+  .btns{display:flex;flex-wrap:wrap;gap:14px;margin-top:22px}
+  @keyframes wipe{to{clip-path:inset(0 0 0 0)}}
+  @keyframes fade{to{opacity:1}}
+  @keyframes up{to{opacity:1;transform:none}}
+
+  /* rotating badge */
+  .badge{position:absolute;z-index:3;right:clamp(300px,31vw,480px);bottom:96px;width:clamp(100px,10vw,140px);height:clamp(100px,10vw,140px);opacity:0;animation:fade 1s 2.2s forwards}
+  .badge svg{width:100%;height:100%;animation:spin 22s linear infinite}
+  .badge .core{position:absolute;inset:0;display:grid;place-items:center}
+  .badge .core img{width:38%}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .badge text{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;fill:var(--navy);font-family:var(--sans);font-weight:500}
+
+  /* marquee */
+  .marquee{position:absolute;left:0;right:0;bottom:0;z-index:4;background:var(--navy);color:var(--sand);overflow:hidden;padding:15px 0;border-top:1px solid var(--gold)}
+  .marquee .row{display:flex;gap:0;width:max-content;animation:scroll 38s linear infinite}
+  .marquee span{font-size:15px;letter-spacing:.2em;text-transform:uppercase;white-space:nowrap;padding:0 26px;display:flex;align-items:center;gap:52px}
+  .marquee span:after{content:"";width:7px;height:7px;border-radius:50% 50% 0 0;background:var(--gold);display:block}
+  @keyframes scroll{to{transform:translateX(-50%)}}
+
+  @media (max-width:900px){
+    .hero{align-items:flex-start;padding-top:96px}
+    .hero-bg{background-position:92% 110%;background-size:auto 62%;opacity:.95;inset:auto -4% 0 -4%;height:70%}
+    .hero-inner{max-width:100%;padding:0 20px 120px}
+    .b2{margin-left:24px}
+    .badge,.arch-line{display:none}
+  }
+
+  /* ============ BUTTONS ============ */
+  .btn{display:inline-block;padding:13px 26px;background:var(--navy);color:var(--cream);font-size:14px;letter-spacing:.08em;text-decoration:none;border:1px solid var(--gold);position:relative;overflow:hidden;transition:.4s var(--ease);cursor:pointer}
+  .btn:before{content:"";position:absolute;inset:0;background:var(--gold);transform:translateY(101%);transition:.45s var(--ease)}
+  .btn span{position:relative;z-index:1}
+  .btn:hover:before{transform:none}
+  .btn.ghost{background:transparent;color:var(--navy);border-color:var(--navy)}
+  .btn.ghost:hover{color:var(--cream)}
+  .btn.ghost:before{background:var(--navy)}
+
+  /* ============ PLACEHOLDERS ============ */
+  .ph{display:grid;place-items:center;text-align:center;color:rgba(255,245,236,.9);font-size:12px;letter-spacing:.2em;text-transform:uppercase;
+    background:radial-gradient(circle at 30% 20%,rgba(236,214,177,.25),transparent 55%),linear-gradient(160deg,var(--navy),var(--ink))}
+  .ph.gold{background:radial-gradient(circle at 70% 20%,rgba(255,245,236,.35),transparent 55%),linear-gradient(160deg,var(--gold),#7d5a3b)}
+  .ph.sky{background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.35),transparent 55%),linear-gradient(160deg,var(--sky),var(--navy))}
+  .ph.sand{color:var(--navy);background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.5),transparent 55%),linear-gradient(160deg,var(--sand),var(--tan))}
+  .ph small{display:block;margin-top:8px;font-size:10px;letter-spacing:.18em;opacity:.7}
+
+  /* ============ OVERLAP FEATURE ============ */
+  section{position:relative}
+  .sec{padding:clamp(80px,12vh,150px) 0}
+  .statement{text-align:center;font-size:clamp(26px,3.4vw,46px);color:var(--navy);padding:0 24px;margin-bottom:clamp(50px,9vh,100px)}
+  .statement .script{font-size:1.25em}
+  .feature{position:relative;width:min(1000px,86vw);margin:0 auto;display:grid;grid-template-columns:repeat(12,1fr);align-items:start}
+  .feature .img{grid-column:1 / 8;grid-row:1;aspect-ratio:4/5;position:relative;overflow:hidden;border-radius:999px 999px 0 0;background:var(--sand)}
+  .feature .img > *{position:absolute;inset:-8% 0;width:100%;height:116%;object-fit:cover;will-change:transform}
+  .feature .card{grid-column:7 / 13;grid-row:1;margin-top:clamp(70px,11vw,150px);background:var(--paper);padding:clamp(28px,3.6vw,52px);position:relative;z-index:2;box-shadow:0 30px 60px -30px rgba(11,40,64,.3);will-change:transform}
+  .feature.flip .img{grid-column:6 / 13}
+  .feature.flip .card{grid-column:1 / 7;margin-top:clamp(40px,6vw,90px)}
+  .card h3{font-size:clamp(26px,2.8vw,38px);margin-bottom:22px;color:var(--ink);position:relative;padding-bottom:16px}
+  .card h3:after,.line:after{content:"";position:absolute;left:0;bottom:0;width:44px;height:2px;background:var(--gold);transform-origin:left;transition:transform 1s .3s var(--ease);transform:scaleX(0)}
+  .card.in h3:after{transform:scaleX(1)}
+  .card p{font-size:clamp(15px,1.25vw,17.5px);line-height:1.7;margin-bottom:1em;color:#1d3550}
+  .card .lead{font-weight:500;color:var(--navy);font-size:clamp(16px,1.4vw,19px)}
+  .card .sign{font-family:var(--script);color:var(--gold);font-size:clamp(22px,2.2vw,30px);line-height:1.2;margin-top:6px}
+  .gap{height:clamp(70px,14vh,170px)}
+  @media (max-width:760px){.feature{display:block}.feature .card{margin:-60px 14px 0}}
+
+  /* ============ MENU TILES ============ */
+  .menu{background:var(--paper);border-top:1px solid var(--gold);border-bottom:1px solid var(--gold)}
+  .menu h2{text-align:center;font-size:clamp(26px,3.2vw,42px);color:var(--navy);margin-bottom:12px}
+  .menu .sub{text-align:center;max-width:640px;margin:0 auto clamp(40px,7vh,70px);font-size:clamp(15px,1.3vw,18px);line-height:1.7;color:#1d3550}
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(14px,2vw,28px)}
+  .tile{display:block;text-align:center;text-decoration:none;color:inherit}
+  .tile .a{aspect-ratio:3/4;border-radius:999px 999px 0 0;overflow:hidden;position:relative;transition:transform .7s var(--ease),box-shadow .7s var(--ease)}
+  .tile .a .ph{height:100%;transition:transform 1.2s var(--ease)}
+  .tile .a img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease)}
+  .tile:hover .a{transform:translateY(-8px);box-shadow:0 26px 40px -24px rgba(11,40,64,.5)}
+  .tile:hover .ph,.tile:hover .a img{transform:scale(1.07)}
+  .tile h3{font-size:clamp(17px,1.6vw,22px);margin-top:16px;color:var(--ink)}
+  .tile p{font-size:13px;color:var(--gold);letter-spacing:.14em;text-transform:uppercase;margin-top:4px}
+  .tiles .tile:nth-child(even){margin-top:clamp(20px,4vw,56px)}
+  @media (max-width:900px){.tiles{grid-template-columns:repeat(2,1fr)}.tiles .tile:nth-child(even){margin-top:0}}
+
+  /* ============ VISION (navy) ============ */
+  .vision{background:var(--navy);color:var(--cream);overflow:hidden}
+  .vision:before{content:"";position:absolute;inset:0;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' fill='none' stroke='%23ECD6B1' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M20 70V40a16 16 0 0 1 32 0v30z'/%3E%3Cpath d='M130 40c-8 8 8 14 0 22M142 40c-8 8 8 14 0 22'/%3E%3Cpath d='M118 70h34v6a17 17 0 0 1-34 0z'/%3E%3Cpath d='M40 150v36M34 150v12a6 6 0 0 0 12 0v-12M46 150v12'/%3E%3Cpath d='M150 160c10-14 24-14 34 0M160 172c6-8 14-8 20 0'/%3E%3C/svg%3E")}
+  .vision .grid{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(40px,7vw,100px);align-items:center}
+  .vision h2{font-size:clamp(30px,3.8vw,52px);margin-bottom:26px}
+  .vision h2 .script{color:var(--sand);font-size:1.15em}
+  .vision p{font-size:clamp(15px,1.3vw,18px);line-height:1.75;margin-bottom:1.1em;color:rgba(255,245,236,.88)}
+  .vision .closer{font-family:var(--script);font-size:clamp(24px,2.8vw,38px);color:var(--sand);margin-top:10px;line-height:1.25}
+  .vision .eyebrow{color:var(--tan)}
+  .route{position:relative;padding-left:46px;list-style:none}
+  .route:before{content:"";position:absolute;left:11px;top:8px;bottom:8px;width:2px;background:linear-gradient(var(--gold),rgba(179,135,95,.2));transform-origin:top;transform:scaleY(0);transition:transform 2s .2s var(--ease)}
+  .route.in:before{transform:scaleY(1)}
+  .route li{position:relative;padding:0 0 38px;opacity:0;transform:translateX(24px);transition:.9s var(--ease)}
+  .route li:last-child{padding-bottom:0}
+  .route.in li{opacity:1;transform:none}
+  .route.in li:nth-child(2){transition-delay:.35s}.route.in li:nth-child(3){transition-delay:.7s}.route.in li:nth-child(4){transition-delay:1.05s}.route.in li:nth-child(5){transition-delay:1.4s}
+  .route li:before{content:"";position:absolute;left:-46px;top:2px;width:24px;height:24px;border-radius:50% 50% 0 0;border:2px solid var(--gold);background:var(--navy)}
+  .route li.now:before{background:var(--gold);box-shadow:0 0 0 6px rgba(179,135,95,.25)}
+  .route b{display:block;font-size:clamp(20px,2vw,28px);font-weight:500;text-transform:lowercase}
+  .route small{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--tan)}
+  @media (max-width:900px){.vision .grid{grid-template-columns:1fr}}
+
+  /* ============ PILLARS ============ */
+  .pillars h2{text-align:center;font-size:clamp(26px,3.2vw,42px);color:var(--navy);margin-bottom:clamp(36px,6vh,64px)}
+  .pgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
+  .pillar{background:var(--paper);padding:34px 22px 30px;text-align:center;border-top:2px solid var(--gold);transition:transform .6s var(--ease),box-shadow .6s var(--ease)}
+  .pillar:hover{transform:translateY(-8px);box-shadow:0 26px 40px -26px rgba(11,40,64,.4)}
+  .pillar i{font-family:var(--script);font-style:normal;font-size:52px;color:var(--gold);line-height:1;display:block;margin-bottom:12px}
+  .pillar p{font-size:clamp(15px,1.2vw,17px);line-height:1.5;color:var(--navy);font-weight:400}
+  @media (max-width:1000px){.pgrid{grid-template-columns:repeat(2,1fr)}.pillar:last-child{grid-column:1 / -1}}
+
+  /* ============ FOUNDER ============ */
+  .founder{background:linear-gradient(#F3E7D6,var(--cream))}
+  .fgrid{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(36px,6vw,90px);align-items:center;margin-bottom:clamp(70px,12vh,140px)}
+  .portrait{aspect-ratio:3/4;border-radius:999px 999px 0 0;overflow:hidden;position:relative;box-shadow:0 40px 60px -40px rgba(11,40,64,.5)}
+  .portrait img{width:100%;height:100%;object-fit:cover;object-position:center 28%}
+  .portrait .ph{height:100%}
+  .fgrid h2{font-size:clamp(30px,3.6vw,50px);color:var(--navy);margin-bottom:10px}
+  .fgrid h2 .script{font-size:1.1em}
+  .fgrid h4{font-size:clamp(17px,1.5vw,21px);font-weight:500;color:var(--gold);margin-bottom:22px;line-height:1.4}
+  .fgrid p{font-size:clamp(15px,1.25vw,17.5px);line-height:1.75;margin-bottom:1em;color:#1d3550}
+  .fgrid .lead{font-weight:500;color:var(--navy)}
+  @media (max-width:800px){.fgrid{grid-template-columns:1fr}.portrait{max-width:340px;margin:0 auto}}
+  .note{background:var(--navy);color:var(--cream);padding:clamp(40px,6vw,84px);position:relative;text-align:center;margin-bottom:clamp(60px,10vh,110px)}
+  .note:before{content:"“";position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-family:var(--script);font-size:150px;line-height:1;color:var(--gold)}
+  .note .eyebrow{color:var(--tan);margin-top:60px}
+  .note p{font-size:clamp(16px,1.5vw,21px);line-height:1.8;margin:0 auto 1.1em;max-width:760px;color:rgba(255,245,236,.92)}
+  .note .by{margin-top:30px}
+  .note .by b{font-family:var(--script);font-weight:400;font-size:clamp(30px,3vw,42px);color:var(--sand);display:block}
+  .note .by span{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--tan)}
+  .promise{text-align:center}
+  .promise h2{font-size:clamp(28px,4.6vw,66px);color:var(--navy);line-height:1.18}
+  .promise h2 span{display:block;opacity:0;transform:translateY(36px);transition:1s var(--ease)}
+  .promise.in h2 span{opacity:1;transform:none}
+  .promise.in h2 span:nth-child(2){transition-delay:.25s;color:var(--gold)}.promise.in h2 span:nth-child(3){transition-delay:.5s}
+  .promise .script{font-size:clamp(24px,3vw,40px);display:block;margin-top:26px}
+
+  /* ============ CONTACT ============ */
+  .info{display:grid;grid-template-columns:repeat(3,1fr);background:var(--paper);border-top:1px solid var(--gold);border-bottom:1px solid var(--gold)}
+  .info > div{padding:clamp(34px,6vh,64px) 28px;text-align:center;border-right:1px solid var(--gold)}
+  .info > div:last-child{border:0}
+  .info svg{width:26px;height:26px;stroke:var(--gold);fill:none;stroke-width:1.4;margin:0 auto 14px}
+  .info h3{font-size:20px;margin-bottom:12px}
+  .info p{font-size:clamp(14px,1.2vw,17px);line-height:1.65}
+  .info a{text-decoration:none;border-bottom:1px solid transparent;transition:.3s}
+  .info a:hover{border-color:var(--gold);color:var(--gold)}
+  @media (max-width:760px){.info{grid-template-columns:1fr}.info > div{border-right:0;border-bottom:1px solid var(--gold)}}
+
+  /* ============ GALLERY ============ */
+  .gallery{background:var(--ink);padding:clamp(40px,7vh,80px) 0;overflow:hidden}
+  .gallery h2{color:var(--sand);text-align:center;font-size:clamp(22px,2.4vw,32px);margin-bottom:34px}
+  .gallery h2 .script{font-size:1.5em;color:var(--gold)}
+  .track-wrap{overflow:hidden;padding:0 clamp(20px,4vw,60px)}
+  .track{display:flex;gap:18px;transition:transform .9s var(--ease)}
+  .slide{flex:0 0 calc((100% - 36px)/3);aspect-ratio:3/4;overflow:hidden;border-radius:999px 999px 0 0;position:relative;background:var(--navy)}
+  .slide > *{width:100%;height:100%;object-fit:cover;transition:transform 1.4s var(--ease)}
+  .slide:hover > *{transform:scale(1.06)}
+  .arrow{position:absolute;top:55%;z-index:5;width:54px;height:54px;border-radius:50%;border:1px solid rgba(255,245,236,.6);background:rgba(11,40,64,.4);color:var(--cream);cursor:pointer;font-size:22px;display:grid;place-items:center;transition:.3s;backdrop-filter:blur(4px)}
+  .arrow:hover{background:var(--gold);border-color:var(--gold)}
+  .arrow.prev{left:clamp(10px,2vw,30px)}.arrow.next{right:clamp(10px,2vw,30px)}
+  @media (max-width:900px){.slide{flex-basis:calc((100% - 18px)/2)}}
+  @media (max-width:560px){.slide{flex-basis:100%}}
+
+  footer{background:var(--navy);color:var(--sand);text-align:center;padding:60px 24px 34px}
+  footer img{height:70px;margin:0 auto 18px}
+  footer .tag{font-family:var(--script);font-size:24px;color:var(--tan);margin-bottom:6px}
+  footer p{font-size:13px;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
+  footer .soc{display:flex;gap:26px;justify-content:center;margin:22px 0 28px}
+  footer .soc a{text-decoration:none;font-size:14px;letter-spacing:.08em;border-bottom:1px solid transparent;transition:.3s}
+  footer .soc a:hover{border-color:var(--gold);color:#fff}
+
+  /* ============ REVEAL ============ */
+  .rv{opacity:0;transform:translateY(46px);transition:opacity 1.1s var(--ease),transform 1.1s var(--ease)}
+  .rv.in{opacity:1;transform:none}
+  .rv.d1{transition-delay:.15s}.rv.d2{transition-delay:.3s}.rv.d3{transition-delay:.45s}
+  .img.rv,.portrait.rv{clip-path:inset(0 0 100% 0);opacity:1;transform:none;transition:clip-path 1.4s var(--ease)}
+  .img.rv.in,.portrait.rv.in{clip-path:inset(0 0 0 0)}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv,.img.rv,.portrait.rv,.route li,.promise h2 span{opacity:1;transform:none;clip-path:none}.route:before{transform:none}.b1,.b2{clip-path:none}.b3,.hero .kicker,.badge{opacity:1;transform:none}}
+</style>
+</head>
+<body class="intro-playing">
+<div class="intro" id="intro" aria-hidden="true">
+  <img class="intro-art" src="assets/loading-screen.svg" alt="">
+  <img class="intro-brand" src="assets/logo.png" alt="MikCaf">
+</div>
+
+<header class="top" id="top">
+  <img class="mini" src="assets/logo.png" alt="MikCaf">
+  <nav class="top-links" aria-label="Main navigation">
+    <a href="#menu">Menu</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#founder">Founder</a>
+    <a class="cta" href="#contact">Visit us</a>
+  </nav>
+</header>
+
+<div class="side-nav-blur" aria-hidden="true"></div>
+<ul class="dots" id="dots">
+  <li><a href="#home" class="on"><span>Home</span><i></i></a></li>
+  <li><a href="#story"><span>Our story</span><i></i></a></li>
+  <li><a href="#menu"><span>Menu</span><i></i></a></li>
+  <li><a href="#vision"><span>Vision</span><i></i></a></li>
+  <li><a href="#founder"><span>Founder</span><i></i></a></li>
+  <li><a href="#contact"><span>Contact</span><i></i></a></li>
+  <li><a href="#gallery"><span>Gallery</span><i></i></a></li>
+</ul>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="doodle"></div>
+  <div class="arch-line a1"></div><div class="arch-line a2"></div>
+
+  <div class="hero-inner">
+    <span class="kicker">Now open in Bengaluru</span>
+    <div class="b1">where our journey <em>begins</em></div>
+    <div class="b2"><img src="assets/logo.png" alt="MikCaf logo"></div>
+    <div class="b3">
+      <p><b>Mumbai's street food. Gujarat's flavours.</b> Bengaluru's new favourite café.</p>
+      <div class="btns">
+        <a class="btn" href="#menu"><span>Explore the menu</span></a>
+        <a class="btn ghost" href="#story"><span>Our story</span></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="badge" aria-hidden="true">
+    <svg viewBox="0 0 140 140"><defs><path id="c" d="M70 70m-54 0a54 54 0 1 1 108 0a54 54 0 1 1-108 0"/></defs>
+      <text><textPath href="#c" textLength="334" lengthAdjust="spacing">Premium quality · Fresh · Affordable ·</textPath></text></svg>
+    <div class="core"><img src="assets/logo.png" alt=""></div>
+  </div>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="row">
+      <span>Vada Pav</span><span>Pav Bhaji</span><span>Dabeli</span><span>Gujarati delicacies</span><span>Grilled sandwiches</span><span>Shakes</span><span>Faloodas</span><span>Ice creams</span>
+      <span>Vada Pav</span><span>Pav Bhaji</span><span>Dabeli</span><span>Gujarati delicacies</span><span>Grilled sandwiches</span><span>Shakes</span><span>Faloodas</span><span>Ice creams</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STORY ================= -->
+<section class="sec" id="story" style="background:linear-gradient(var(--cream),#F3E7D6);overflow:hidden">
+  <h2 class="statement rv">mumbai's street food. gujarat's flavours.<br><span class="script">bengaluru's new favourite café.</span></h2>
+
+  <div class="feature">
+    <div class="img rv">
+      <!-- TEMP IMAGE: swap for café / street-food photo -->
+      <img src="assets\MikCaf Modern Café Interior.png" alt="MikCaf café" data-speed="0.06">
+    </div>
+    <div class="card rv d1" data-speed="-0.04">
+      <span class="eyebrow">Our story</span>
+      <h3>where our journey begins</h3>
+      <p class="lead">Our first MikCaf café opens its doors in Bengaluru with a celebration of two much-loved food cultures – Mumbai and Gujarat.</p>
+      <p>Inspired by the vibrant streets of Mumbai and the comforting flavours of Gujarat, our first outlet brings together iconic street-food favourites, traditional tastes and contemporary café indulgences.</p>
+      <p>We want every visit to feel special – whether you're enjoying a nostalgic street-food favourite, discovering something new or simply spending quality time with friends and family.</p>
+      <p>Bengaluru is where our journey begins, but it is certainly not where our ambition ends.</p>
+      <p class="sign">One beginning. Many destinations. Endless flavours.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MENU ================= -->
+<section class="sec menu" id="menu">
+  <div class="wrap">
+    <h2 class="rv">a menu built on <span class="script">variety &amp; flavour</span></h2>
+    <p class="sub rv d1">From the irresistible Vada Pav, Pav Bhaji and Dabeli to Gujarati-inspired delicacies, grilled sandwiches, refreshing beverages, shakes, faloodas and ice creams — designed to celebrate variety, flavour and the joy of eating.</p>
+    <div class="tiles">
+      <!-- TEMP IMAGES: replace each .ph with <img src="assets/xyz.jpg" alt=""> -->
+      <a class="tile rv" href="#"><div class="a"><img src="assets/Vada_pav_.jpg" alt="MikCaf vada pav"></div><h3>vada pav</h3><p>Mumbai classic</p></a>
+      <a class="tile rv d1" href="#"><div class="a"><img src="assets/pav_bhaji.jpg" alt="MikCaf pav bhaji"></div><h3>pav bhaji</h3><p>Street favourite</p></a>
+      <a class="tile rv d2" href="#"><div class="a"><img src="assets/Dabeli_.jpg" alt="MikCaf dabeli"></div><h3>dabeli</h3><p>Kutchi special</p></a>
+      <a class="tile rv d3" href="#"><div class="a"><img src="assets/Mumbai_tava_pulav.jpg" alt="MikCaf Mumbai tava pulao"></div><h3>Mumbai tava pulao</h3><p>Mumbai favourite</p></a>
+      <a class="tile rv" href="#"><div class="a"><img src="assets/Masala_grilled_sandwich.jpg" alt="MikCaf masala grilled sandwich"></div><h3>grilled sandwiches</h3><p>Hot &amp; toasty</p></a>
+      <a class="tile rv d1" href="#"><div class="a"><img src="assets/cold_cocoa_.jpg" alt="MikCaf cold cocoa"></div><h3>beverages</h3><p>Refreshing</p></a>
+      <a class="tile rv d2" href="#"><div class="a"><img src="assets/falooda_.jpg" alt="MikCaf falooda"></div><h3>shakes &amp; faloodas</h3><p>Cool &amp; indulgent</p></a>
+      <a class="tile rv d3" href="#"><div class="a"><img src="assets/ice_cream.jpg" alt="MikCaf ice cream"></div><h3>ice creams</h3><p>Sweet endings</p></a>
+    </div>
+    <div style="text-align:center;margin-top:56px"><a class="btn" href="#"><span>View full menu</span></a></div>
+  </div>
+</section>
+
+<!-- ================= VISION ================= -->
+<section class="sec vision" id="vision">
+  <div class="wrap grid">
+    <div>
+      <span class="eyebrow rv">Our vision</span>
+      <h2 class="rv d1">a global <span class="script">café brand</span></h2>
+      <p class="rv">Our vision is to build MikCaf into a globally recognised café brand, bringing premium-quality food, diverse flavours and memorable experiences to people across cities and countries.</p>
+      <p class="rv">We envision a family of contemporary cafés, each with its own identity, local inspiration and unique culinary experiences, yet united by one common promise – exceptional quality, freshly prepared food, warm hospitality and accessible prices.</p>
+      <p class="rv">We believe premium café experiences should be within everyone's reach. Our ambition is to make great food an everyday pleasure rather than an occasional luxury.</p>
+      <p class="rv">With a passion for innovation, respect for local food cultures and a commitment to customer happiness, we aim to create a brand that grows beyond geographical boundaries.</p>
+      <p class="closer rv">From Bengaluru to the World. One MikCaf at a Time.</p>
+    </div>
+    <ul class="route" id="route">
+      <li class="now"><small>Where it begins</small><b>Bengaluru</b></li>
+      <li><small>Next</small><b>Mumbai</b></li>
+      <li><small>Growing</small><b>Other major Indian cities</b></li>
+      <li><small>Crossing borders</small><b>United Kingdom</b></li>
+      <li><small>And beyond</small><b>International markets</b></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= PILLARS ================= -->
+<section class="sec pillars" id="pillars" style="padding-bottom:0">
+  <div class="wrap" style="width:min(1180px,90vw)">
+    <h2 class="rv">our five <span class="script">brand pillars</span></h2>
+    <div class="pgrid">
+      <div class="pillar rv"><i>1</i><p>Premium quality at accessible prices</p></div>
+      <div class="pillar rv d1"><i>2</i><p>Freshly prepared food</p></div>
+      <div class="pillar rv d2"><i>3</i><p>Founder-led recipe development and ingredient selection</p></div>
+      <div class="pillar rv d3"><i>4</i><p>Diverse cuisines and local flavours</p></div>
+      <div class="pillar rv d3"><i>5</i><p>Warm hospitality and memorable experiences</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PASSION ================= -->
+<section class="sec" id="recipe" style="overflow:hidden">
+  <div class="feature flip">
+    <div class="img rv">
+      <!-- TEMP IMAGE: swap for kitchen / ingredients photo -->
+      <div class="ph sand" data-speed="0.06"><div>Kitchen / ingredients photo<small>replace me</small></div></div>
+    </div>
+    <div class="card rv d1" data-speed="-0.04">
+      <span class="eyebrow">The passion behind every recipe</span>
+      <h3>every recipe has a thought behind it</h3>
+      <p class="lead">Every ingredient matters. At MikCaf, great food begins with great attention to detail.</p>
+      <p>Our recipes are thoughtfully developed and curated under the guidance of our founder, Anamika Desai – a nutritionist, home chef and food entrepreneur with years of experience in the food industry.</p>
+      <p>For us, serving delicious food is not just about taste. It is also about understanding ingredients, maintaining quality and ensuring that every dish is prepared with care. From selecting ingredients to the preparation process and the final presentation, every detail matters.</p>
+      <p>Even when it comes to indulgent favourites and fast food, we believe quality should never take a back seat.</p>
+      <p>Our philosophy is simple: serve food that tastes wonderful, is thoughtfully prepared and makes people look forward to coming back.</p>
+      <p class="sign">Because great taste deserves great care.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOUNDER ================= -->
+<section class="sec founder" id="founder">
+  <div class="wrap">
+    <div class="fgrid">
+      <div class="portrait rv">
+        <img src="assets/MikCaf Café Owner Portrait.png" alt="MikCaf café owner Anamika Desai">
+      </div>
+      <div>
+        <span class="eyebrow rv">Chef-led · Founder-created · Passionately prepared</span>
+        <h2 class="rv d1">every recipe has <span class="script">a personal touch</span></h2>
+        <h4 class="rv d1">Every dish has a story.</h4>
+        <p class="lead rv">At MikCaf, food is personal.</p>
+        <p class="rv">Every recipe on our menu is personally created by our founder, Anamika Desai, bringing together her culinary passion, creativity and years of experience in the food industry.</p>
+        <p class="rv">As a nutritionist, home chef and food entrepreneur, Anamika pays special attention to the ingredients that go into every dish, the preparation methods and the quality of food served to our customers. From developing recipes and selecting ingredients to freshly preparing delicious food, she brings a hands-on approach to the MikCaf kitchen.</p>
+        <p class="rv">We believe fast food can be more than just quick and convenient. It can be freshly made, thoughtfully prepared, full of flavour and served with uncompromising attention to quality.</p>
+        <p class="rv">Whether it's an indulgent street-food favourite, a satisfying meal or a delightful dessert, every creation reflects our founder's passion for good food.</p>
+      </div>
+    </div>
+
+    <div class="note rv">
+      <span class="eyebrow">A note from our founder</span>
+      <p>Food has always been more than a profession for me; it has been a passion.</p>
+      <p>Having spent years in the food industry, including 14 years building my catering business in the UK, I have learnt that the secret to creating memorable food lies in the details – the ingredients we choose, the way we prepare our food and the love we put into every recipe.</p>
+      <p>As a nutritionist and home chef, I naturally pay attention to what goes into the food we serve. At MikCaf, this philosophy continues even when we create indulgent fast-food favourites.</p>
+      <p>I want people to enjoy their favourite foods without compromising on the importance of quality and thoughtful preparation.</p>
+      <p>My dream is to build MikCaf into a brand where great taste, quality and memorable experiences come together, wherever we go in the world.</p>
+      <p>Thank you for being part of this journey.</p>
+      <div class="by"><b>Anamika Desai</b><span>Founder, MikCaf</span></div>
+    </div>
+
+    <div class="promise" id="promise">
+      <h2><span>Personally created.</span><span>Freshly prepared.</span><span>Proudly served.</span></h2>
+      <span class="script">That's the MikCaf promise.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section class="info" id="contact">
+  <div class="rv">
+    <svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.2A7 7 0 0 1 19 9.8C19 14.8 12 21 12 21z"/><circle cx="12" cy="10" r="2.5"/></svg>
+    <h3>address</h3>
+    <p>[Shop No. 00, Street Name],<br>[Locality], Bengaluru, 560000</p>
+  </div>
+  <div class="rv d1">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+    <h3>hours</h3>
+    <p>Mon – Sun<br>[10:00 am – 11:00 pm]</p>
+  </div>
+  <div class="rv d2">
+    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="m3 7 9 6 9-6"/></svg>
+    <h3>say hello</h3>
+    <p><a href="mailto:hello@mikcaf.com">hello@mikcaf.com</a><br><a href="tel:+910000000000">+91 00000 00000</a></p>
+  </div>
+</section>
+
+<!-- ================= GALLERY ================= -->
+<section class="gallery" id="gallery">
+  <h2 class="rv">a peek inside <span class="script">MikCaf</span></h2>
+  <button class="arrow prev" id="prev" aria-label="Previous">&#8249;</button>
+  <button class="arrow next" id="next" aria-label="Next">&#8250;</button>
+  <div class="track-wrap">
+    <div class="track" id="track">
+      <!-- TEMP IMAGES: replace each slide with real photography -->
+      <div class="slide"><img src="assets/cold_cocoa_.jpg" alt="MikCaf cold cocoa"></div>
+      <div class="slide"><img src="assets/pav_bhaji.jpg" alt="MikCaf pav bhaji"></div>
+      <div class="slide"><img src="assets/kiosk.jpg" alt="" style="object-position:30% 20%"></div>
+      <div class="slide"><img src="assets/falooda_.jpg" alt="MikCaf falooda"></div>
+      <div class="slide"><img src="assets/MikCaf Modern Café Interior.png" alt="MikCaf café interior" style="object-position:55% 50%"></div>
+      <div class="slide"><img src="assets/Modern MikCaf Interior with Kannada Signage.png" alt="MikCaf interior with Kannada signage"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <img src="assets/logo-cream.png" alt="MikCaf">
+  <div class="tag">From Bengaluru to the World</div>
+  <div class="soc"><a href="#">Instagram</a><a href="#">Facebook</a><a href="#">Zomato</a></div>
+  <p>© 2026 MikCaf · All rights reserved</p>
+</footer>
+
+<script>
+(function(){
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var intro = document.getElementById('intro');
+  var introArt = intro.querySelector('.intro-art');
+  var introBrand = intro.querySelector('.intro-brand');
+  var introDone = false;
+  function finishIntro(){
+    if(introDone) return;
+    introDone = true;
+    var navBrand = document.querySelector('.top .mini');
+    var navRect = navBrand.getBoundingClientRect();
+    introBrand.style.left = (navRect.left + navRect.width / 2) + 'px';
+    introBrand.style.top = (navRect.top + navRect.height / 2) + 'px';
+    introBrand.style.width = navRect.width + 'px';
+    introBrand.style.height = navRect.height + 'px';
+    introBrand.style.maxHeight = navRect.height + 'px';
+    intro.classList.add('is-settling');
+    introBrand.style.opacity = '1';
+    window.setTimeout(function(){ intro.classList.add('is-done'); document.body.classList.remove('intro-playing'); }, 1250);
+  }
+  if(reduce){
+    finishIntro();
+  } else {
+    introArt.addEventListener('load', function(){ window.setTimeout(finishIntro, 2050); }, {once:true});
+    if(introArt.complete) window.setTimeout(finishIntro, 2050);
+    window.setTimeout(finishIntro, 5000);
+  }
+
+  /* scroll reveals (clip-path'd images are watched via their parent) */
+  function watch(target, flag, th){
+    new IntersectionObserver(function(es,o){ if(es[0].isIntersecting){ flag.classList.add('in'); o.disconnect(); } },{threshold:th||.18}).observe(target);
+  }
+  document.querySelectorAll('.rv').forEach(function(el){
+    watch((el.classList.contains('img')||el.classList.contains('portrait')) ? el.parentElement : el, el, .15);
+  });
+  watch(document.getElementById('route'), document.getElementById('route'), .3);
+  watch(document.getElementById('promise'), document.getElementById('promise'), .4);
+
+  /* Side navigation contrast follows the surface behind its center point. */
+  var dots = document.getElementById('dots');
+  function updateDotTheme(){
+    if(!dots || innerWidth<=900) return;
+    var r=dots.getBoundingClientRect(), el=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);
+    var color='';
+    while(el && el!==document.body){
+      color=getComputedStyle(el).backgroundColor;
+      var m=color.match(/rgba?\(([^)]+)\)/);
+      if(m){var v=m[1].split(',').map(Number); if(v.length<4 || v[3]>.05) break;}
+      el=el.parentElement;
+    }
+    var vals=(color.match(/\d+(?:\.\d+)?/g)||[]).map(Number);
+    var dark=vals.length>=3 && (vals[0]*.2126+vals[1]*.7152+vals[2]*.0722)<145;
+    dots.style.setProperty('--dot-ink',dark?'#F1E5D5':'#31446C');
+  }
+  var dotThemeTick=false;
+  function queueDotTheme(){if(!dotThemeTick){dotThemeTick=true;requestAnimationFrame(function(){updateDotTheme();dotThemeTick=false;});}}
+  addEventListener('scroll',queueDotTheme,{passive:true});
+  addEventListener('resize',queueDotTheme);
+  updateDotTheme();
+  /* side dots */
+  var links = [].slice.call(document.querySelectorAll('#dots a'));
+  var secs  = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var so = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ var i = secs.indexOf(e.target); links.forEach(function(l,j){ l.classList.toggle('on', i===j); }); } });
+  },{threshold:.3});
+  secs.forEach(function(s){ so.observe(s); });
+
+  /* parallax: images drift against the overlapping cards */
+  var par = [].slice.call(document.querySelectorAll('[data-speed]'));
+  var topbar = document.getElementById('top'), ticking = false;
+  function frame(){
+    var vh = innerHeight;
+    topbar.classList.toggle('scrolled', scrollY > vh*.6);
+    if(!reduce) par.forEach(function(el){
+      var r = el.parentElement.getBoundingClientRect();
+      if(r.bottom < -200 || r.top > vh+200) return;
+      el.style.transform = 'translate3d(0,'+((r.top + r.height/2 - vh/2) * parseFloat(el.dataset.speed)).toFixed(1)+'px,0)';
+    });
+    ticking = false;
+  }
+  addEventListener('scroll', function(){ if(!ticking){ ticking = true; requestAnimationFrame(frame);} },{passive:true});
+  addEventListener('resize', frame); frame();
+
+  /* gallery carousel */
+  var track = document.getElementById('track'), slides = track.children, idx = 0, timer;
+  function perView(){ return innerWidth<=560 ? 1 : innerWidth<=900 ? 2 : 3; }
+  function go(n){
+    var max = slides.length - perView();
+    idx = n > max ? 0 : n < 0 ? max : n;
+    track.style.transform = 'translateX('+(-idx*(slides[0].getBoundingClientRect().width+18))+'px)';
+  }
+  function auto(){ clearInterval(timer); if(!reduce) timer = setInterval(function(){ go(idx+1); }, 4200); }
+  document.getElementById('next').onclick = function(){ go(idx+1); auto(); };
+  document.getElementById('prev').onclick = function(){ go(idx-1); auto(); };
+  addEventListener('resize', function(){ go(idx); });
+  var sx=null; track.addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; },{passive:true});
+  track.addEventListener('touchend',function(e){ if(sx===null) return; var dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>40) go(idx+(dx<0?1:-1)); sx=null; auto(); });
+  auto();
+})();
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
